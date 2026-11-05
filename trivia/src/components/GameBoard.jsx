@@ -33,19 +33,20 @@ export default function GameBoard({ mode, onExit, onGameOver }) {
     }
   }, [timeLeft, mode, score, currentIndex, onGameOver]);
 
-  let fogClass = 'game-board__fog--normal';
+  // Modificador de estado según el tiempo restante
+  let fogStateClass = 'fog--normal';
   if (mode === 'survival') {
     if (timeLeft <= 15) {
-      fogClass = 'game-board__fog--danger';
+      fogStateClass = 'fog--danger';
     } else if (timeLeft <= 30) {
-      fogClass = 'game-board__fog--warning';
+      fogStateClass = 'fog--warning';
     }
   }
 
   const currentQ = MOCK_QUESTIONS[currentIndex % MOCK_QUESTIONS.length];
 
   const handleSelectOption = (index) => {
-    if (isAnswerLocked) return; // Evitar múltiples clics rápidos
+    if (isAnswerLocked) return;
     setIsAnswerLocked(true);
     setSelectedAnswer(index);
 
@@ -58,7 +59,6 @@ export default function GameBoard({ mode, onExit, onGameOver }) {
       if (mode === 'survival') setTimeLeft((t) => Math.max(0, t - 5));
     }
 
-    // Esperar 800ms para mostrar el color verde/rojo antes de pasar a la siguiente
     setTimeout(() => {
       setSelectedAnswer(null);
       setIsAnswerLocked(false);
@@ -68,8 +68,16 @@ export default function GameBoard({ mode, onExit, onGameOver }) {
 
   return (
     <div className="game-container-wrapper">
-      <div className={`game-board ${mode === 'survival' ? fogClass : ''}`}>
-        {mode === 'survival' && <div className={`game-board__fog ${fogClass}`} />}
+      <div className="game-board">
+        {/* EFECTO DE HUMO CON PARTÍCULAS / BOCANADAS EN MOVIMIENTO */}
+        {mode === 'survival' && (
+          <div className={`fog-overlay ${fogStateClass}`}>
+            <div className="fog-puff fog-puff--1"></div>
+            <div className="fog-puff fog-puff--2"></div>
+            <div className="fog-puff fog-puff--3"></div>
+            <div className="fog-puff fog-puff--4"></div>
+          </div>
+        )}
 
         <div className="game-board__content">
           {/* HEADER DE LA PARTIDA */}
@@ -94,18 +102,17 @@ export default function GameBoard({ mode, onExit, onGameOver }) {
             <h2 className="question-card__title">{currentQ.question}</h2>
           </section>
 
-          {/* TARJETAS DE RESPUESTA CON FEEDBACK VISUAL */}
+          {/* TARJETAS DE RESPUESTA */}
           <section className="answers-grid">
             {currentQ.options.map((opt, idx) => {
               const optionLetter = String.fromCharCode(65 + idx);
               
-              // Lógica de clases para el feedback visual (verde/rojo)
               let statusClass = '';
               if (selectedAnswer !== null) {
                 if (idx === currentQ.correct) {
-                  statusClass = 'answer-card--correct'; // Siempre marca la correcta en verde
+                  statusClass = 'answer-card--correct';
                 } else if (idx === selectedAnswer) {
-                  statusClass = 'answer-card--wrong'; // Marca tu elección en rojo si fallaste
+                  statusClass = 'answer-card--wrong';
                 }
               }
 
