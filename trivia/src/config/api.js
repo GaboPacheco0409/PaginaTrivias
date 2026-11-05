@@ -1,7 +1,7 @@
 // src/config/api.js
 
 const BASE_URL = 'https://opentdb.com';
-
+const TRANSLATE_URL = 'https://api.mymemory.translated.net/get';
 export const API_ENDPOINTS = {
   obtenerToken: `${BASE_URL}/api_token.php?command=request`,
   resetearToken: (token) => `${BASE_URL}/api_token.php?command=reset&token=${token}`,
