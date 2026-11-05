@@ -11,7 +11,7 @@ export default function GameBoard({ mode, filters = {}, onExit, onGameOver }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(mode === 'survival' ? 45 : 0);
   const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = [useState(null)[0], useState(null)[1]]; // o const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswerLocked, setIsAnswerLocked] = useState(false);
 
   useEffect(() => {
@@ -55,7 +55,11 @@ export default function GameBoard({ mode, filters = {}, onExit, onGameOver }) {
         console.log("Preguntas crudas:", datosTrivia.results);
 
         if (datosTrivia.response_code === 0 && Array.isArray(datosTrivia.results)) {
-          const preguntasListas = formatearPreguntas(datosTrivia.results);
+          console.log("TRADUCIENDO PREGUNTAS AL ESPAÑOL");
+          const preguntasListas = await formatearPreguntas(datosTrivia.results);
+          console.log("=== 4. PREGUNTAS TRADUCIDAS ===");
+          console.log(preguntasListas);
+          
           setQuestions(preguntasListas);
         } else if (datosTrivia.response_code === 3 || datosTrivia.response_code === 4) {
           localStorage.removeItem('opentdb_token');
