@@ -1,7 +1,5 @@
 // src/components/Menu.jsx
-import { useState, useEffect } from 'react';
 import Footer from './Footer';
-import { API_ENDPOINTS } from '../config/api';
 
 const TOP_PLAYERS = [
   { rank: 1, name: 'YUPQR', score: 2450, badge: '🥇' },
@@ -9,41 +7,7 @@ const TOP_PLAYERS = [
   { rank: 3, name: 'Sistemas99', score: 1850, badge: '🥉' },
 ];
 
-export default function Menu({ onStartGame }) {
-  const [categorias, setCategorias] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('');
-
-  useEffect(() => {
-    const cargarCategorias = async () => {
-      try {
-        const res = await fetch(API_ENDPOINTS.obtenerCategorias);
-        const data = await res.json();
-        console.log("=== CATEGORÍAS CARGADAS EN MENÚ ===", data.trivia_categories);
-        setCategorias(data.trivia_categories || []);
-      } catch (err) {
-        console.error("Error cargando categorías en el menú:", err);
-      }
-    };
-    cargarCategorias();
-  }, []);
-
-  const grupos = {
-    "Cultura General y Otros": [],
-    "Entretenimiento": [],
-    "Ciencia": []
-  };
-
-  categorias.forEach((cat) => {
-    if (cat.name.startsWith("Entertainment: ")) {
-      grupos["Entretenimiento"].push({ id: cat.id, name: cat.name.replace("Entertainment: ", "") });
-    } else if (cat.name.startsWith("Science")) {
-      grupos["Ciencia"].push({ id: cat.id, name: cat.name.replace("Science: ", "") });
-    } else {
-      grupos["Cultura General y Otros"].push({ id: cat.id, name: cat.name });
-    }
-  });
-
+export default function Menu({ onStartGame, onOpenFreeConfig }) {
   return (
     <div className="layout">
       <header className="header">
@@ -100,39 +64,7 @@ export default function Menu({ onStartGame }) {
             <p className="mode-card__description">
               Preguntas al azar sin fin. Filtra por tus categorías y dificultad preferidas.
             </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-              <select 
-                value={selectedCategory} 
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', background: '#1e293b', color: '#fff' }}
-              >
-                <option value="">📂 Todas las categorías</option>
-                {Object.entries(grupos).map(([grupo, lista]) => (
-                  <optgroup key={grupo} label={grupo}>
-                    {lista.map((sub) => (
-                      <option key={sub.id} value={sub.id}>{sub.name}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-
-              <select 
-                value={selectedDifficulty} 
-                onChange={(e) => setSelectedDifficulty(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', background: '#1e293b', color: '#fff' }}
-              >
-                <option value="">⚡ Cualquier dificultad</option>
-                <option value="easy">Fácil (Easy)</option>
-                <option value="medium">Medio (Medium)</option>
-                <option value="hard">Difícil (Hard)</option>
-              </select>
-            </div>
-
-            <button 
-              className="mode-card__btn" 
-              onClick={() => onStartGame('free', { category: selectedCategory, difficulty: selectedDifficulty })}
-            >
+            <button className="mode-card__btn" onClick={onOpenFreeConfig}>
               Modo Infinito ➔
             </button>
           </article>
